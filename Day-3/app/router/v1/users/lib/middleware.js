@@ -1,9 +1,27 @@
 const fs = require('fs');
-
+const crypto = require('crypto');
 class Middleware {
+    login(req, res, next) {
+        try {
+            if (req.nUserIndex !== -1) {
+                if (req.aDatabase[req.nUserIndex].sPassword === req.body.sPassword) {
+                    // return next();
+                    res.send({sMessage:"successfully logged in"});
+                }
+                else {
+                    return res.send({ sMessage: "please enter your password correctly" });
+                }
+            }
+            else {
+                return res.send({ sMessage: "UserName not found" });
+            }
+        } catch (error) {
+            return res.send({ sMessage: "Internal server error in middleware" });
+        }
+    }
     register(req, res, next) {
         try {
-            if (req.nUserIndex!==-1) {
+            if (req.nUserIndex !== -1) {
                 return res.send({ sMessage: "this userName already exists" });
             }
             else {
@@ -15,7 +33,7 @@ class Middleware {
     }
     password(req, res, next) {
         try {
-            if (req.nUserIndex!==-1) {
+            if (req.nUserIndex !== -1) {
                 if (req.aDatabase[req.nUserIndex].sPassword === req.body.sOldPassword) {
                     return next();
                 }
@@ -30,9 +48,9 @@ class Middleware {
             return res.send({ sMessage: "Internal server error in middleware" });
         }
     }
-    user(req,res,next){
+    user(req, res, next) {
         try {
-            if (req.nUserIndex!==-1) {
+            if (req.nUserIndex !== -1) {
                 if (req.aDatabase[req.nUserIndex].sPassword === req.body.sPassword) {
                     return next();
                 }
@@ -47,16 +65,25 @@ class Middleware {
             return res.send({ sMessage: "Internal server error in middleware" });
         }
     }
-    readDatabase(req,res,next){
+    readDatabase(req, res, next) {
         try {
             const oDatabase = fs.readFileSync('./app/users.json', 'utf8');
             const { aDatabase } = JSON.parse(oDatabase);
             const nUserIndex = aDatabase.findIndex(oUser => oUser.sUserName == req.body.sUserName);
-            req.aDatabase=aDatabase;
-            req.nUserIndex=nUserIndex;
+            req.aDatabase = aDatabase;
+            req.nUserIndex = nUserIndex;
             return next();
         } catch (error) {
             return res.send({ sMessage: "Internal server error in middleware" });
+        }
+    }
+    passwordHash(req, res, next) {
+        try {
+            const sPassword = req.body.sPassword;
+            req.body.sPassword= crypto.createHash('sha256').update(sPassword).digest('hex');
+            next();
+        } catch (error) {
+            return res.json({sMessage: error.message});
         }
     }
 }
