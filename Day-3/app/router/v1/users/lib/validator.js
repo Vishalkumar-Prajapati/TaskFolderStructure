@@ -20,7 +20,7 @@ class Validator {
                 return res.send({ sMessage: "all fields required" });
             }
             else {
-                if (/^([A-Z][0-9]+)$/i.test(sUserName) || /^([0-9]+[A-Z])$/i.test(sUserName) || /^([0-9]+[A-Z][0-9]+)$/i.test(sUserName)) {
+                if (/^\d*[A-Z]\d*$/.test(sUserName)) {
                     if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{16,}$/.test(sPassword)) {
                         return next();
                     }
@@ -61,7 +61,7 @@ class Validator {
                 return res.send({ sMessage: "all fields required" });
             }
             else {
-                if (/^([A-Z][0-9]+)$/i.test(sNewUserName) || /^([0-9]+[A-Z])$/i.test(sNewUserName) || /^([0-9]+[A-Z][0-9]+)$/i.test(sNewUserName)) {
+                if (/^\d*[A-Z]\d*$/.test(sNewUserName)) {
                     return  next();
                 }
                 else {
