@@ -5,32 +5,32 @@ const { message, status } = require('../../../../message/index');
 const common = require('../../../../common/index');
 
 class Middleware {
-  async login(req, res, next) {
+  async loginUser(req, res, next) {
     try {
       req.nUserIndex = common.findIndex(req.body.sUserName);
       if (req.nUserIndex !== -1) {
         const { sPassword } = aUsers[req.nUserIndex];
         const bResult = await common.comparePassword(req.body.sPassword, sPassword);
         if (!bResult) {
-          return res.status(status.badrequest).send(message.invalidCredentials);
+          return res.status(status.badRequest).json(message.invalidCredentials);
         }
         return next();
       }
-      return res.status(status.badrequest).send(message.invalidCredentials);
+      return res.status(status.badRequest).json(message.invalidCredentials);
     } catch (error) {
-      return res.status(status.internalServerError).send(message.middlewareError);
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 
-  register(req, res, next) {
+  registerUser(req, res, next) {
     try {
       req.nUserIndex = common.findIndex(req.body.sUserName);
       if (req.nUserIndex !== -1) {
-        return res.status(status.badrequest).send(message.userExists);
+        return res.status(status.badRequest).json(message.userExists);
       }
       return next();
     } catch (error) {
-      return res.status(status.internalServerError).send(message.middlewareError);
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 
@@ -39,11 +39,11 @@ class Middleware {
       const { sPassword } = aUsers[req.nUserIndex];
       const bResult = await common.comparePassword(req.body.sPassword, sPassword);
       if (!bResult) {
-        return res.status(status.badrequest).send(message.invalidCredentials);
+        return res.status(status.badRequest).json(message.invalidCredentials);
       }
       return next();
     } catch {
-      return res.status(status.internalServerError).send(message.middlewareError);
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 
@@ -54,16 +54,16 @@ class Middleware {
         const nUserIndex = await common.verify(sToken);
         // console.log(nUserIndex);
         if (nUserIndex === -1) {
-          return res.status(status.unauthorized).send(message.tokenVerificationError);
+          return res.status(status.unAuthorized).json(message.tokenVerificationError);
         }
         req.nUserIndex = nUserIndex;
         next();
         return;
       }
-      res.status(status.unauthorized).send(message.tokenRequire);
+      return res.status(status.unAuthorized).json(message.tokenRequire);
     } catch (error) {
       console.log(65, error);
-      return res.status(status.internalServerError).send(message.middlewareError);
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 }

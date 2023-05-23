@@ -1,55 +1,69 @@
-const fs = require('fs');
+/* eslint-disable consistent-return */
+require('dotenv').config();
+const aUsers = require('../../../../users.json');
+const { message, status } = require('../../../../message/index');
+const common = require('../../../../common/index');
 
 class Middleware {
-  register(req, res, next) {
+  async loginUser(req, res, next) {
     try {
+      req.nUserIndex = common.findIndex(req.body.sUserName);
       if (req.nUserIndex !== -1) {
-        return res.send({ sMessage: 'this userName already exists' });
+        const { sPassword } = aUsers[req.nUserIndex];
+        const bResult = await common.comparePassword(req.body.sPassword, sPassword);
+        if (!bResult) {
+          return res.status(status.badRequest).json(message.invalidCredentials);
+        }
+        return next();
+      }
+      return res.status(status.badRequest).json(message.invalidCredentials);
+    } catch (error) {
+      return res.status(status.internalServerError).json(message.middlewareError);
+    }
+  }
+
+  registerUser(req, res, next) {
+    try {
+      req.nUserIndex = common.findIndex(req.body.sUserName);
+      if (req.nUserIndex !== -1) {
+        return res.status(status.badRequest).json(message.userExists);
       }
       return next();
     } catch (error) {
-      return res.send({ sMessage: 'Internal server error in middleware' });
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 
-  password(req, res, next) {
+  async password(req, res, next) {
     try {
-      if (req.nUserIndex !== -1) {
-        if (req.aDatabase[req.nUserIndex].sPassword === req.body.sOldPassword) {
-          return next();
-        }
-        return res.send({ sMessage: 'please enter your old password correctly' });
+      const { sPassword } = aUsers[req.nUserIndex];
+      const bResult = await common.comparePassword(req.body.sPassword, sPassword);
+      if (!bResult) {
+        return res.status(status.badRequest).json(message.wrongPass);
       }
-      return res.send({ sMessage: 'UserName not found' });
-    } catch (error) {
-      return res.send({ sMessage: 'Internal server error in middleware' });
-    }
-  }
-
-  user(req, res, next) {
-    try {
-      if (req.nUserIndex !== -1) {
-        if (req.aDatabase[req.nUserIndex].sPassword === req.body.sPassword) {
-          return next();
-        }
-        return res.send({ sMessage: 'please enter your password correctly' });
-      }
-      return res.send({ sMessage: 'UserName not found' });
-    } catch (error) {
-      return res.send({ sMessage: 'Internal server error in middleware' });
-    }
-  }
-
-  readDatabase(req, res, next) {
-    try {
-      const oDatabase = fs.readFileSync('./app/users.json', 'utf8');
-      const { aDatabase } = JSON.parse(oDatabase);
-      const nUserIndex = aDatabase.findIndex((oUser) => oUser.sUserName === req.body.sUserName);
-      req.aDatabase = aDatabase;
-      req.nUserIndex = nUserIndex;
       return next();
+    } catch {
+      return res.status(status.internalServerError).json(message.middlewareError);
+    }
+  }
+
+  async verifyToken(req, res, next) {
+    try {
+      const sToken = req.headers.authorization;
+      if (sToken) {
+        const nUserIndex = await common.verify(sToken);
+        // console.log(nUserIndex);
+        if (nUserIndex === -1) {
+          return res.status(status.unAuthorized).json(message.tokenVerificationError);
+        }
+        req.nUserIndex = nUserIndex;
+        next();
+        return;
+      }
+      return res.status(status.unAuthorized).json(message.tokenRequire);
     } catch (error) {
-      return res.send({ sMessage: 'Internal server error in middleware' });
+      console.log(65, error);
+      return res.status(status.internalServerError).json(message.middlewareError);
     }
   }
 }

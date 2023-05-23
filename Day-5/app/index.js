@@ -10,6 +10,10 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use('/', router);
 
+app.all('*', (_req, res) => {
+  res.status(404).json({ sMessage: 'route not found' });
+});
+
 app.listen(config.PORT, (err) => {
   if (err) throw new Error(err);
   console.log('listening on port 3000');

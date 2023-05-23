@@ -11,8 +11,28 @@ class Common {
     return false;
   }
 
+  validPasswordV2(sPassword) {
+    if (sPassword) return /^(?=.*[A-Z])(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{16}$/.test(sPassword);
+    return false;
+  }
+
   validUserName(sUserName) {
-    if (sUserName) return /^\d*[A-Z]\d*$/.test(sUserName);
+    if (sUserName) return /^\d*[A-Z]\d+$/.test(sUserName) || /^\d+[A-Z]\d*$/.test(sUserName);
+    return false;
+  }
+
+  validUserNameV2(sUserName) {
+    if (sUserName) return /^[a-z]*[~!@#$%^&*_-][a-z]+$/.test(sUserName) || /^[a-z]+[~!@#$%^&*_-][a-z]*$/.test(sUserName);
+    return false;
+  }
+
+  validEmail(sEmail) {
+    if (sEmail) return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(sEmail);
+    return false;
+  }
+
+  validPhoneNumber(nPhoneNumber) {
+    if (nPhoneNumber) return /^[([1-9][0-9]{9}$/.test(nPhoneNumber);
     return false;
   }
 
