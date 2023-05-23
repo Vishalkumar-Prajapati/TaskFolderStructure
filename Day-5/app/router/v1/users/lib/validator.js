@@ -55,7 +55,7 @@ class Validator {
       if (!(sNewUserName)) {
         return res.status(status.badRequest).json(message.mandatoryFields);
       }
-      if (common.validUserName) {
+      if (common.validUserName(sNewUserName)) {
         return next();
       }
       return res.status(status.badRequest).json(message.userNameNotValid);

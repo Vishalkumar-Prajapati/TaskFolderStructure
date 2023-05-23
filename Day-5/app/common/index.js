@@ -12,7 +12,7 @@ class Common {
   }
 
   validPasswordV2(sPassword) {
-    if (sPassword) return /^(?=.*[A-Z])(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{16}$/.test(sPassword);
+    if (sPassword) return /^(?=.*[A-Z])(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{16,}$/.test(sPassword);
     return false;
   }
 
@@ -70,12 +70,12 @@ class Common {
       jwt.verify(sToken, process.env.SECURITY_KEY, (err, data) => {
         if (err) {
           console.error(err);
-          resolve(-1);
+          resolve({ nUserIndex: -1, sRole: null });
           return;
         }
-        const { sUserName } = data;
+        const { sUserName, sRole } = data;
         const nUserIndex = aUsers.findIndex((oUser) => oUser.sUserName === sUserName);
-        resolve(nUserIndex);
+        resolve({ nUserIndex, sRole });
       });
     });
   }

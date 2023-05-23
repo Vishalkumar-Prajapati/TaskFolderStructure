@@ -34,12 +34,12 @@ class Middleware {
     }
   }
 
-  async password(req, res, next) {
+  async changePassword(req, res, next) {
     try {
       const { sPassword } = aUsers[req.nUserIndex];
       const bResult = await common.comparePassword(req.body.sPassword, sPassword);
       if (!bResult) {
-        return res.status(status.badRequest).json(message.invalidCredentials);
+        return res.status(status.badRequest).json(message.wrongPass);
       }
       return next();
     } catch {
@@ -51,18 +51,29 @@ class Middleware {
     try {
       const sToken = req.headers.authorization;
       if (sToken) {
-        const nUserIndex = await common.verify(sToken);
+        const { nUserIndex, sRole } = await common.verify(sToken);
         // console.log(nUserIndex);
         if (nUserIndex === -1) {
           return res.status(status.unAuthorized).json(message.tokenVerificationError);
         }
         req.nUserIndex = nUserIndex;
+        req.sRole = sRole;
         next();
         return;
       }
       return res.status(status.unAuthorized).json(message.tokenRequire);
     } catch (error) {
       console.log(65, error);
+      return res.status(status.internalServerError).json(message.middlewareError);
+    }
+  }
+
+  authorizeAdmin(req, res, next) {
+    try {
+      if (req.sRole === 'admin') return next();
+      return res.status(status.statusNotFound).json(message.unAuthorized);
+    } catch (error) {
+      console.error('authorize', error);
       return res.status(status.internalServerError).json(message.middlewareError);
     }
   }

@@ -23,9 +23,13 @@ const messages = {
   tokenVerificationError: { message: 'token verification error' },
   userNameNotValid: { sMessage: 'Only one charecter is capital and others are numbers in username' },
   passwordNotValid: { sMessage: 'at least one capital letter, at least one small letter, at least one symbol, total length 16 in password' },
+  userNameNotValidV2: { sMessage: 'all small letter, and one symbol in UserName' },
+  passwordNotValidV2: { sMessage: 'at least one capital letter ,at least one symbol, total length 16 in password' },
   authFail: { message: 'Authentication fail' },
   userExists: { sMessage: 'this userName already exists' },
   tokenRequire: { sMessage: 'token is require' },
+  emailNotValid: { sMessage: 'Please enter a valid email' },
+  userNameUpdated: { sMessage: 'userName updated successfully' },
 };
 
 module.exports = messages;
