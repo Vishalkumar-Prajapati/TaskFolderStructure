@@ -1,4 +1,4 @@
-const User =require('../../../../model/UserSchema');
+const User =require('../../../../model/userSchema');
 
 class Controller{
     async addUser(req,res) {

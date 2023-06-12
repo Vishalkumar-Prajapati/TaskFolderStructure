@@ -1,5 +1,5 @@
 const Transaction = require('../../../../model/transactionSchema');
-// const User = require('../../../../model/UserSchema');
+// const User = require('../../../../model/userSchema');
 // const Seller = require('../../../../model/sellerSchema');
 const Cars = require('../../../../model/carSchema');
 
